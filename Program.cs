@@ -7,13 +7,18 @@ class Program
 {
     static void Main(string[] args)
     {
+        const string pattern = "dd-MM-yy";
+
         while (true)
         {
+            Console.WriteLine("==============================================="); 
             Console.WriteLine("1. List all To-Dos for today.\n" +
                 "2. List all To-Dos that you have.\n" +
                 "3. Add new To-Do.\n" +
-                "4. Exit.\n");
+                "4. Exit.");
+            Console.Write(">> ");
             string choice = Console.ReadLine();
+            Console.WriteLine("===============================================");
 
             if (choice == "1")
             {
@@ -26,34 +31,40 @@ class Program
             else if (choice == "3")
             {
                 // Title
-                Console.WriteLine("Enter title...");
+                Console.WriteLine("Enter title:");
                 Todo newTodo= new Todo();
+                Console.Write(">> ");
                 newTodo.Title = Console.ReadLine();
 
                 // Description
-                Console.WriteLine("Enter description...");
+                Console.WriteLine("Enter description:");
+                Console.Write(">> ");
                 newTodo.Description = Console.ReadLine();
 
                 // Date
-                Console.WriteLine("Enter date...");
+                //Console.WriteLine("Enter day as 'DD'...");
+                //string day = Console.ReadLine();
+                //Console.WriteLine("Enter month as 'MM'...");
+                //string month = Console.ReadLine();
+                //Console.WriteLine("Enter year as 'YYYY'...");
+                //string year = Console.ReadLine();
+                //string dateInput_ = day + " " + month + " " + year;
+                //newTodo.DateValue = dateInput_;
+
+                Console.WriteLine("Enter a date (dd/MM/yyyy): ");
+                Console.Write(">> ");
                 string dateInput = Console.ReadLine();
-
-                string pattern = "dd-MM-yy";
-                DateTime parsedDate;
-
-                if (DateTime.TryParseExact(dateInput, pattern, null, DateTimeStyles.None, out parsedDate))
+                try
                 {
-
+                    DateTime date = DateTime.Parse(dateInput);
+                    string dateWithoutTime = date.ToString("dd/MM/yyyy");
+                    Console.WriteLine("The date you entered is: " + dateWithoutTime);
+                    newTodo.DateValue = dateWithoutTime;
                 }
-                else
+                catch (Exception)
                 {
-                    Console.WriteLine("Error: Unable to convert '{0}' to a date and time.",
-                        dateInput);
+                    throw;
                 }
-
-                newTodo.DateValue = parsedDate;
-                    
-                                        
             }
             else if (choice == "4")
             {
@@ -64,6 +75,10 @@ class Program
                 Console.WriteLine("Please check your input. It is only possible to enter Numbers from 1 to 4");
                 continue;
             }
+
+            Console.WriteLine("\nPress any key for menu.");
+            Console.Write(">> ");
+            Console.ReadLine();
         }
         
     }

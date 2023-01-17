@@ -11,7 +11,7 @@ namespace To_Do_App
     {
         private string title;
         private string description;
-        private DateTime dateValue;
+        private string dateValue;
 
         public string Title
         {
