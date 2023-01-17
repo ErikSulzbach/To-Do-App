@@ -10,7 +10,7 @@ With this app you can create todos in your console, list them for today or all o
 
 ### Create a todo
 
-Main acteur: User
+Main acteur: User  
 Target: Create a todo with name, date and the content.
 
 1. The user choose "3".

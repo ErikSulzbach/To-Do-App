@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.Reflection;
+using To_Do_App;
 
 class Program
 {
@@ -22,7 +25,35 @@ class Program
             }
             else if (choice == "3")
             {
+                // Title
+                Console.WriteLine("Enter title...");
+                Todo newTodo= new Todo();
+                newTodo.Title = Console.ReadLine();
 
+                // Description
+                Console.WriteLine("Enter description...");
+                newTodo.Description = Console.ReadLine();
+
+                // Date
+                Console.WriteLine("Enter date...");
+                string dateInput = Console.ReadLine();
+
+                string pattern = "dd-MM-yy";
+                DateTime parsedDate;
+
+                if (DateTime.TryParseExact(dateInput, pattern, null, DateTimeStyles.None, out parsedDate))
+                {
+
+                }
+                else
+                {
+                    Console.WriteLine("Error: Unable to convert '{0}' to a date and time.",
+                        dateInput);
+                }
+
+                newTodo.DateValue = parsedDate;
+                    
+                                        
             }
             else if (choice == "4")
             {
