@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 using To_Do_App;
+using BetterConsoleTables;
 
 class Program
 {
@@ -25,11 +26,42 @@ class Program
 
             if (choice == "1")
             {
-
+                string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = $"SELECT * FROM todos WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+                    Table table = new Table("Task ID", "Title", "Description", "Expire date");
+                    while (rdr.Read())
+                    {
+                        table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
+                    }
+                    rdr.Close();
+                    conn.Close();
+                    Console.Write(table.ToString());
+                }
             }
             else if (choice == "2")
             {
-            
+                string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM todos";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+                    Table table = new Table("Task ID", "Title", "Description", "Expire date");
+                    while (rdr.Read())
+                    {
+                        table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
+                    }
+                    rdr.Close();    
+                    conn.Close();
+                    Console.Write(table.ToString());
+                }
+                
             }
             else if (choice == "3")
             {
@@ -109,7 +141,7 @@ class Program
             }
             else if (choice == "5")
             {
-
+                Environment.Exit(0);
             }
             else
             {
