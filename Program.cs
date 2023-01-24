@@ -137,7 +137,68 @@ class Program
             }
             else if (choice == "4")
             {
+                string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM todos";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+                    Table table = new Table("Task ID", "Title", "Description", "Expire date");
+                    while (rdr.Read())
+                    {
+                        table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
+                    }
+                    rdr.Close();
+                    Console.Write(table.ToString());
 
+                    try
+                    {
+                        // Ask user which tasks are finished
+                        Console.WriteLine("Which task have you done? Select by 'Task ID' (Only one at a time).");
+                        Console.Write(">> ");
+                        string finishedTasks = Console.ReadLine();
+
+                        //Test if the input is a number
+                        try
+                        {
+                            int test_input = Int32.Parse(finishedTasks);
+                        }
+                        catch (Exception)
+                        {
+
+                            throw;
+                        }
+
+                        string query_delete = $"DELETE FROM todos WHERE id = {finishedTasks};";
+                        MySqlCommand cmd_delete = new MySqlCommand(query_delete, conn);
+                        cmd_delete.ExecuteNonQuery();
+
+                        Console.WriteLine("Successfully completed task(s) " + finishedTasks);
+                        Console.WriteLine("Press any key for showing all todos.");
+                        Console.ReadLine();
+
+                        MySqlDataReader rdr_updated = cmd.ExecuteReader();
+                        Table table_updated = new Table("Task ID", "Title", "Description", "Expire date");
+                        while (rdr_updated.Read())
+                        {
+                            table_updated.AddRow(rdr_updated[0], rdr_updated[1], rdr_updated[2], rdr_updated[3]);
+                        }
+                        rdr_updated.Close();
+                        Console.Write(table_updated.ToString());
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+                    
+
+
+                    conn.Close();
+                }
+
+                
             }
             else if (choice == "5")
             {
