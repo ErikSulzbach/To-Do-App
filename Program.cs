@@ -9,22 +9,60 @@ class Program
 {
     static void Main(string[] args)
     {
-        const string pattern = "dd-MM-yy";
-
         // Main menu
         while (true)
         {
-            Console.WriteLine("==============================================="); 
-            Console.WriteLine("1. List all To-Dos for today.\n" +
-                "2. List all To-Dos that you have.\n" +
-                "3. Add new To-Do.\n" +
-                "4. Mark ToDos as finished\n" +
-                "5. Exit.");
-            Console.Write(">> ");
-            string choice = Console.ReadLine();
-            Console.WriteLine("===============================================");
+            string[] options = { "1. List all To-Dos for today.",
+                "2. List all To-Dos that you have.",
+                "3. Add new To-Do.",
+                "4. Mark ToDos as finished",
+                "5. Exit."
+            };
+            int selectedOption = 0;
+            ConsoleKeyInfo key;
 
-            if (choice == "1")
+            do
+            {
+                Console.Clear();
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedOption)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(options[i]);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
+                }
+
+                key = Console.ReadKey();
+
+                if (key.Key == ConsoleKey.UpArrow)
+                {
+                    selectedOption--;
+                    if (selectedOption < 0)
+                    {
+                        selectedOption = options.Length - 1;
+                    }
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    selectedOption++;
+                    if (selectedOption == options.Length)
+                    {
+                        selectedOption = 0;
+                    }
+                }
+            } while (key.Key != ConsoleKey.Enter);
+
+            int choice = selectedOption;
+            Console.Clear();
+
+            if (choice == 0)
             {
                 string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
                 using (MySqlConnection conn = new MySqlConnection(connString))
@@ -43,7 +81,7 @@ class Program
                     Console.Write(table.ToString());
                 }
             }
-            else if (choice == "2")
+            else if (choice == 1)
             {
                 string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
                 using (MySqlConnection conn = new MySqlConnection(connString))
@@ -63,7 +101,7 @@ class Program
                 }
                 
             }
-            else if (choice == "3")
+            else if (choice == 2)
             {
                 // Title
                 Console.WriteLine("Enter title:");
@@ -135,7 +173,7 @@ class Program
                     throw;
                 }
             }
-            else if (choice == "4")
+            else if (choice == 3)
             {
                 string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
                 using (MySqlConnection conn = new MySqlConnection(connString))
@@ -200,7 +238,7 @@ class Program
 
                 
             }
-            else if (choice == "5")
+            else if (choice == 4)
             {
                 Environment.Exit(0);
             }
