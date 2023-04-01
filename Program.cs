@@ -9,21 +9,61 @@ class Program
 {
     static void Main(string[] args)
     {
+        const string pattern = "dd-MM-yy";
+
         // Main menu
         while (true)
         {
-            int choice = ChooseOptionByUser();
-            Console.Clear();
+            Console.WriteLine("==============================================="); 
+            Console.WriteLine("1. List all To-Dos for today.\n" +
+                "2. List all To-Dos that you have.\n" +
+                "3. Add new To-Do.\n" +
+                "4. Mark ToDos as finished\n" +
+                "5. Exit.");
+            Console.Write(">> ");
+            string choice = Console.ReadLine();
+            Console.WriteLine("===============================================");
 
-            if (choice == 0)
+            if (choice == "1")
             {
-                ListTodosToday();
+                string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = $"SELECT * FROM todos WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+                    Table table = new Table("Task ID", "Title", "Description", "Expire date");
+                    while (rdr.Read())
+                    {
+                        table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
+                    }
+                    rdr.Close();
+                    conn.Close();
+                    Console.Write(table.ToString());
+                }
             }
-            else if (choice == 1)
+            else if (choice == "2")
             {
-                ListAllTodos();
+                string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
+                using (MySqlConnection conn = new MySqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM todos";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+                    Table table = new Table("Task ID", "Title", "Description", "Expire date");
+                    while (rdr.Read())
+                    {
+                        table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
+                    }
+                    rdr.Close();    
+                    conn.Close();
+                    Console.Write(table.ToString());
+                }
+                
             }
-            else if (choice == 2)
+            else if (choice == "3")
             {
                 // Title
                 Console.WriteLine("Enter title:");
@@ -51,7 +91,6 @@ class Program
                 int userYearInt;
                 try
                 {
-                    // Check year
                     userYearInt = Int32.Parse(userYear);
                     if (userYearInt < DateTime.Now.Year)
                     {
@@ -74,14 +113,29 @@ class Program
                 // Safe To-Do in database
                 try
                 {
-                    SafeToDatabase(newTodo.Title, newTodo.Description, newTodo.DateValue);
+                    string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;";
+                    using (MySqlConnection conn = new MySqlConnection(connString))
+                    {
+                        conn.Open();
+                        string query = "INSERT INTO todos (title, description, date) VALUES (@val1, @val2, @val3)";
+                        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@val1", newTodo.Title);
+                            cmd.Parameters.AddWithValue("@val2", newTodo.Description);
+                            cmd.Parameters.AddWithValue("@val3", newTodo.DateValue);
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                    }
+                    Console.WriteLine("The task was succsessfully saved.");
                 }
                 catch (Exception)
                 {
+
                     throw;
                 }
             }
-            else if (choice == 3)
+            else if (choice == "4")
             {
                 string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
                 using (MySqlConnection conn = new MySqlConnection(connString))
@@ -146,13 +200,13 @@ class Program
 
                 
             }
-            else if (choice == 4)
+            else if (choice == "5")
             {
                 Environment.Exit(0);
             }
             else
             {
-                Console.WriteLine("Please check your input. It is only possible to enter Numbers from 1 to 5");
+                Console.WriteLine("Please check your input. It is only possible to enter Numbers from 1 to 4");
                 continue;
             }
 
@@ -161,116 +215,5 @@ class Program
             Console.ReadLine();
         }
         
-    }
-
-    static int ChooseOptionByUser()
-    {
-        string[] options = { "1. List all To-Dos for today.",
-                "2. List all To-Dos that you have.",
-                "3. Add new To-Do.",
-                "4. Mark ToDos as finished",
-                "5. Exit."
-            };
-        int selectedOption = 0;
-        ConsoleKeyInfo key;
-
-        do
-        {
-            Console.Clear();
-            for (int i = 0; i < options.Length; i++)
-            {
-                if (i == selectedOption)
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkGray;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(options[i]);
-                    Console.ResetColor();
-                }
-                else
-                {
-                    Console.WriteLine(options[i]);
-                }
-            }
-
-            key = Console.ReadKey();
-
-            if (key.Key == ConsoleKey.UpArrow)
-            {
-                selectedOption--;
-                if (selectedOption < 0)
-                {
-                    selectedOption = options.Length - 1;
-                }
-            }
-            else if (key.Key == ConsoleKey.DownArrow)
-            {
-                selectedOption++;
-                if (selectedOption == options.Length)
-                {
-                    selectedOption = 0;
-                }
-            }
-        } while (key.Key != ConsoleKey.Enter);
-
-        return selectedOption;
-    }
-
-    static void ListTodosToday()
-    {
-        string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
-        using (MySqlConnection conn = new MySqlConnection(connString))
-        {
-            conn.Open();
-            string query = $"SELECT * FROM todos WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';";
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            MySqlDataReader rdr = cmd.ExecuteReader();
-            Table table = new Table("Task ID", "Title", "Description", "Expire date");
-            while (rdr.Read())
-            {
-                table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
-            }
-            rdr.Close();
-            conn.Close();
-            Console.Write(table.ToString());
-        }
-    }
-
-    static void ListAllTodos()
-    {
-        string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;AllowZeroDateTime=true;";
-        using (MySqlConnection conn = new MySqlConnection(connString))
-        {
-            conn.Open();
-            string query = "SELECT * FROM todos";
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            MySqlDataReader rdr = cmd.ExecuteReader();
-            Table table = new Table("Task ID", "Title", "Description", "Expire date");
-            while (rdr.Read())
-            {
-                table.AddRow(rdr[0], rdr[1], rdr[2], rdr[3]);
-            }
-            rdr.Close();
-            conn.Close();
-            Console.Write(table.ToString());
-        }
-    }
-
-    static void SafeToDatabase(string title, string description, string dateValue)
-    {
-        string connString = "Server=localhost;Database=todoapp;Uid=root;Pwd=;";
-        using (MySqlConnection conn = new MySqlConnection(connString))
-        {
-            conn.Open();
-            string query = "INSERT INTO todos (title, description, date) VALUES (@val1, @val2, @val3)";
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                cmd.Parameters.AddWithValue("@val1", title);
-                cmd.Parameters.AddWithValue("@val2", description);
-                cmd.Parameters.AddWithValue("@val3", dateValue);
-                cmd.ExecuteNonQuery();
-            }
-            conn.Close();
-        }
-        Console.WriteLine("The task was succsessfully saved.");
     }
 }
